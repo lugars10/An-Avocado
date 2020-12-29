@@ -30,44 +30,68 @@ class Physics
         //console.log(body[6]);
         for(let i = 0; i != body[6].length; i++)
         {
-            if(body[6][i] === undefined){break;}
+            if(typeof body[6][i] === "undefined"){break;}
+            //let q = -1; 
+            //console.log(body[2] + ", " + body[3]); 
+            //console.log(body[6]); 
             if(body[6][i][0] == "right" && this.colSystem.isInRangeY(bodyID, body[6][i][1]) && body[2] < 0)
             {
                 body[2] = 0;
                 body[4] = 0;
+                //console.log(0); 
+                //q = 0; 
             }
             else if(body[6][i][0] == "left" && this.colSystem.isInRangeY(bodyID, body[6][i][1]) && body[2] > 0)
             {
                 body[2] = 0;
                 body[4] = 0;  
-                //console.log("xd");
+                //console.log(1); 
+                //q = 1; 
             }
             else if(body[6][i][0] == "up" && this.colSystem.isInRangeX(bodyID, body[6][i][1]) && body[3] > 0)
             {
                 body[3] = 0;
                 body[5] = 0; 
+                //console.log(2); 
+                //q = 2; 
             }
             else if(body[6][i][0] == "down" && this.colSystem.isInRangeX(bodyID, body[6][i][1]) && body[3] < 0)
             {
                 body[3] = 0;
-                body[5] = 0; 
+                //body[5] = 0;
+                //console.log(3);  
+                //q = 3;  
             }
             else if(body[6][i][0] == "right" && (!this.colSystem.isInRangeY(bodyID, body[6][i][1]) || body[2] > 0))
             {
                 body[6].splice(i, 1);
+                //console.log(4); 
+                //q = 4; 
             }
             else if(body[6][i][0] == "left" && (!this.colSystem.isInRangeY(bodyID, body[6][i][1]) || body[2] < 0))
             {
                 body[6].splice(i, 1);
+                //console.log(5); 
+                //q = 5; 
             }
             else if(body[6][i][0] == "up" && (!this.colSystem.isInRangeX(bodyID, body[6][i][1]) || body[3] < 0))
             {
                 body[6].splice(i, 1);
+                //console.log(6); 
+                //q = 6; 
             }
             else if(body[6][i][0] == "down" && (!this.colSystem.isInRangeX(bodyID, body[6][i][1]) || body[3] > 0))
             {
                 body[6].splice(i, 1);
+                //console.log(7); 
+                //q = 7; 
             }
+            else
+            {
+                //console.log("lol");
+            }
+            
+            //console.log(body[6][i][0] + ", " + this.colSystem.isInRangeX(bodyID, body[6][i][1]) + ", " + this.colSystem.isInRangeY(bodyID, body[6][i][1]) + ", " + body[2] + ", " + body[3]); 
         }
 
         //console.log(body[0].y);
@@ -111,6 +135,7 @@ class Physics
         body[4] += time;  
         body[5] += time;
 
+        //console.log(body[3]); 
         let contained = false; 
         for(let i = 0; i != this.kineticBodies.length; i++)
         {
@@ -138,6 +163,52 @@ class Physics
         }
     }
 
+    resetXForBody(bodyID)
+    {
+        let body;
+        let kinetic;
+        for(let i = 0; i!= this.bodies.length; i++)
+        {
+            if(this.bodies[i][1] == bodyID)
+            {
+                body = this.bodies[i];
+            }
+        }
+        
+        for(let i = 0; i!= this.kineticBodies.length; i++)
+        {
+            if(this.kineticBodies[i][1] == bodyID)
+            {
+                kinetic = this.kineticBodies[i]; 
+            }
+        }
+        body[2] = 0;
+        kinetic[2] = 0;
+    }
+
+    resetYForBody(bodyID)
+    {
+        let body;
+        let kinetic;
+        for(let i = 0; i!= this.bodies.length; i++)
+        {
+            if(this.bodies[i][1] == bodyID)
+            {
+                body = this.bodies[i];
+            }
+        }
+        
+        for(let i = 0; i!= this.kineticBodies.length; i++)
+        {
+            if(this.kineticBodies[i][1] == bodyID)
+            {
+                kinetic = this.kineticBodies[i]; 
+            }
+        }
+        body[3] = 0;
+        kinetic[3] = 0;
+    }
+
     addBody(node, bodyId, bodyWidth, bodyHeight) 
     {
         //bodies[i][2] stores vx
@@ -149,9 +220,56 @@ class Physics
         this.colSystem.addCollider(node, bodyWidth, bodyHeight, bodyId); //adds collider to the body
     }
 
+    removeBody(bodyID)
+    {
+        for(let i = 0; i != this.bodies.length; i++)
+        {
+            for(let j = 0; j != this.bodies[i][6].length; j++)
+            {
+                if(this.bodies[i][6][j][1] == bodyID)
+                {
+                    this.bodies[i][6].splice(j); 
+                }
+            }
+            if(this.bodies[i][1] == bodyID)
+            {
+                this.bodies.splice(i, 1);
+                break;  
+            }
+         
+        }
+
+        this.colSystem.removeCollider(bodyID); 
+    }
+
+    clearCollisions(bodyID)
+    {
+        let body; 
+        let x;
+        
+        for(let i = 0; i!=this.bodies.length; i++)
+        {
+            if(this.bodies[i][1] == bodyID){body = this.bodies[i];}
+            x = i; 
+        }
+        
+        this.bodies[x][6] = []; 
+        body[6] = [];
+        //console.log(body); 
+        /*for(let i = 0; i!= body[6].length; i++)
+        {
+            if(body[6][i][1] == "f1")
+            {
+                body[6].splice(i, 1); 
+            }
+        } */
+       
+        //console.log(body);
+    }
+
     //colSystem functions 
     //bodyID1 is the kinetic body while bodyID2 is the static body when handleCol is true
-    areColliding(bodyID1, bodyID2, handleCol=false, handlerIndex=undefined)
+    areColliding(bodyID1, bodyID2, handleCol=false, handlerIndex=undefined, returnDirection = false)
     {
         let body1; 
         let body2; 
@@ -160,6 +278,8 @@ class Physics
             if(this.bodies[i][1] == bodyID1){body1 = this.bodies[i];}
             if(this.bodies[i][1] == bodyID2){body2 = this.bodies[i];}
         }
+        if(typeof body1 == "undefined"){return 0;}
+        if(typeof body2 == "undefined"){return 0;}
         if(body1[1] != bodyID1){throw new Error("No body1 with that id");} //Error if there's no body with the ID
         if(body2[1] != bodyID2){throw new Error("No body2 with that id");}
         //console.log(body1); 
@@ -172,54 +292,82 @@ class Physics
         {
                 if(body1[6][i][1] == bodyID2)
                 {
-                    colliding = true; 
+                    //colliding = true; 
+                    if(returnDirection == false){colliding = true;}
+                    else if(returnDirection){colliding = body1[6][i][0]}
                     this.colSystem.collisionDirections[handlerIndex] = undefined; 
+                    if(bodyID1 == "player"){console.log(colliding);  }
                     return colliding;
                 }
         }
         colliding = this.colSystem.areColliding(bodyID1, bodyID2, handleCol, {x: body1[2], y: body1[3]}, handlerIndex); //detects collision 
-
-
+        
+       
         if(handleCol && this.colSystem.collisionDirections[handlerIndex] != undefined)
         {
-
+            if(bodyID1 == "player"){console.log(body1);  }
             let direction = this.colSystem.collisionDirections[handlerIndex];
             let x;
             let y;  
             switch(direction)   //corrects the position of the kinetic object such that body1 is "the border" of collision again 
             {
                 case "right":
+                    if(body1[2] == 0){break;}
+                    //console.log("right" + body1[2])
                     y = body1[3] * (body2[0].x+body2[0].width - body1[0].x)/body1[2] + body1[0].y; 
                     body1[0].setPos(body2[0].x+body2[0].width, y); 
-                    body1[2] = 0;
-                    body1[6].push(["right", bodyID2]); 
-                    console.log("right");
+                    //body1[2] = 0;
+                    body1[6].push(["right", bodyID2]);
+                    //console.log("right"  + ", " + bodyID2)
+                    //console.log(body1[6]);  
+                    
                     break;
                 case "left":
+                    if(body1[2] == 0){break;}
+                    //console.log("left" + body1[2])
                     y = body1[3] * (body2[0].x - body1[0].width - body1[0].x)/body1[2] + body1[0].y; 
                     body1[0].setPos(body2[0].x - body1[0].width, y);
-                    body1[2] = 0;
+                    //body1[2] = 0;
                     body1[6].push(["left", bodyID2]); 
-                    //console.log("left");
-                    break;
+                    //console.log("left"  + ", " + bodyID2);
+                    //console.log(body1[0].height + body1[0].y + ", " + body2[0].y );  
+                    //console.log(body1[6]);  
+                    
+                    //body1[6];
+                    break;  
                 case "up":
+                    if(body1[3] == 0){break;}
+                    //console.log("up" + body1[3])
                     x = body1[2] * (body2[0].y - body1[0].height - body1[0].y)/body1[3] + body1[0].x
                     body1[0].setPos(x, body2[0].y - body1[0].height);
                     body1[3] = 0;
+                    body1[5] = 0;
                     body1[6].push(["up", bodyID2]); 
-                    //console.log("up");
+                    //console.log("up"  + ", " + bodyID2);
+                    //console.log(body1[6]);  
                     break;
+                
                 case "down":
+                    if(body1[3] == 0){break;}
+                    body1[6].push(["down", bodyID2]);
+                    //console.log("down" + body1[3])
                     x = body1[2] * (body2[0].y + body1[0].height - body1[0].y)/body1[3] + body1[0].x
                     body1[0].setPos(x, body2[0].y + body2[0].height);
-                    body1[3] = 0;
-                    body1[6].push(["down", bodyID2]); 
-                    //console.log("down");
+                    //body1[3] = 0;
+                    //body1[5] = 0;
+                    
+                    //console.log("down" + ", " + bodyID2);
+                    //console.log(body1[6]);  
                     break;
+                     
                 default:
-                    //console.log("Something wrong :(");
+                    console.log("Something wrong :(");
+                    console.log(this.colSystem.collisionDirections[handlerIndex]); 
                     break;
             }
+            console.log(direction);
+
+            if(colliding && returnDirection){colliding = direction;}
             
         }
         return colliding; 
